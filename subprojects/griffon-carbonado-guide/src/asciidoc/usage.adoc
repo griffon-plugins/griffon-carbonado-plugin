@@ -1,0 +1,223 @@
+
+[[_Usage]]
+= Usage
+
+The following sections describe how you may use this plugin in an project.
+
+== Configuration
+
+You must create a configuration file named `Carbonado` that holds the settings for creating instances of `{link_repository}`.
+This file follows the same standard configuration mechanism as the application's `Config` file, which means you can define the
+configuration using
+
+ * a properties file
+ * a Java file
+ * a Groovy script
+
+The following example shows the default settings needed to connect the default repository taking into account that each
+environment may connect to a different repositories.
+
+[source,groovy,options="nowrap"]
+.src/main/resources/Carbonado.groovy
+----
+include::{path_griffon_carbonado_core}/src/test/resources/Carbonado.groovy[lines=16..51]
+----
+
+You may configure multiple named repositories (the default factory is aptly named `default`) as the following snippet
+shows
+
+[source,groovy,options="nowrap"]
+.src/main/resources/Carbonado.groovy
+----
+include::{path_griffon_carbonado_core}/src/test/resources/Carbonado.groovy[lines=53..60]
+----
+
+The following properties are optional
+
+[cols="4*",options="header"]
+|===
+| Property           | Type    | Default | Description
+| type               | String  | map     | Defines the type of repository. Valid values are `map`, `jdbc`, `bdb`.
+| connect_on_startup | boolean | false   | Establishes a connection to the repository at the beginning of the `Startup` phase.
+|===
+
+The plugin's <<_modules, module>> registers a `{api_carbonado_handler}` helper class that defines the base contract
+for accessing a repository and issue queries to it. This class has the following methods
+
+[source,java,options="nowrap"]
+.griffon.plugins.carbonado.CarbonadoHandler.java
+----
+include::{path_griffon_carbonado_core}/src/main/java/griffon/plugins/carbonado/CarbonadoHandler.java[tags=methods,indent=0]
+----
+
+These method are aware of multiple repositories. If no repositoryName is specified when calling them then the default
+repository will be selected. You can inject an instance of this class anywhere it's needed using `@Inject`. There is one
+callback you may use with this method: `{api_repository_callback}`.
+
+This callback is defined using a functional interface approach, which means you can apply lambda expressions if running
+with JDK8+ or closures if running Groovy.
+
+[source,java,options="nowrap"]
+.griffon.plugins.carbonado.RepositoryCallback.java
+----
+include::{path_griffon_carbonado_core}/src/main/java/griffon/plugins/carbonado/RepositoryCallback.java[lines=26..-1]
+----
+
+=== Bootstrap
+
+You may execute arbitrary repository calls during connection and disconnection from a `{link_repository}`. Simply
+create a class that implements the `{api_carbonado_bootstrap}` interface and register it within a module, for example
+
+[source,java,options="nowrap"]
+.src/main/java/com/acme/SampleCarbonadoBootstrap.java
+----
+package com.acme;
+
+import griffon.plugins.carbonado.CarbonadoBootstrap;
+import com.amazon.carbonado.Repository;
+
+import javax.annotation.Nonnull;
+import javax.inject.Named;
+
+@Named("sample")
+public class SampleCarbonadoBootstrap implements CarbonadoBootstrap {
+    @Override
+    public void init(@Nonnull String repositoryName, @Nonnull Repository repository) {
+        // operations after first connection to the repository
+    }
+
+    @Override
+    public void destroy(@Nonnull String repositoryName, @Nonnull Repository repository) {
+        // operations before disconnecting from the repository
+    }
+}
+----
+
+[source,java,options="nowrap"]
+.src/main/java/com/acme/ApplicationModule.java
+----
+package com.acme;
+
+import griffon.plugins.carbonado.CarbonadoBootstrap;
+import griffon.core.injection.Module;
+import org.codehaus.griffon.runtime.core.injection.AbstractModule;
+import org.kordamp.jipsy.ServiceProviderFor;
+
+@ServiceProviderFor(Module.class)
+public class ApplicationModule extends AbstractModule {
+    @Override
+    protected void doConfigure() {
+        bind(CarbonadoBootstrap.class)
+            .to(SampleCarbonadoBootstrap.class)
+            .asSingleton();
+    }
+}
+----
+
+== Example
+
+The following is a trivial usage of the `{api_carbonado_handler}` inside a Java service
+
+[source,java,options="nowrap"]
+.com.acme.SampleService.java
+----
+package com.acme;
+
+import griffon.core.artifact.GriffonService;
+import griffon.metadata.ArtifactProviderFor;
+import org.codehaus.griffon.runtime.core.artifact.AbstractGriffonService;
+
+import griffon.plugins.carbonado.CarbonadoHandler;
+import griffon.plugins.carbonado.CarbonadoCallback;
+import com.amazon.carbonado.Repository;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
+@ArtifactProviderFor(GriffonService.class)
+public class SampleService extends AbstractGriffonService {
+    @Inject
+    private CarbonadoHandler carbonadoHandler;
+
+    public String getPersonName(final int id) {
+         return carbonadoHandler.withCarbonado(new CarbonadoCallback<String>() {
+             public String handle(@Nonnull String repositoryName, @Nonnull Repository repository) {
+                 ...
+         });
+    }
+}
+----
+
+Here's the Groovy version of it
+
+[source,groovy,options="nowrap"]
+.com.acme.SampleService.groovy
+----
+package com.acme
+
+import griffon.core.artifact.GriffonService
+import griffon.metadata.ArtifactProviderFor
+
+import griffon.plugins.carbonado.CarbonadoHandler
+import com.amazon.carbonado.Repository
+
+import javax.inject.Inject
+
+@ArtifactProviderFor(GriffonService)
+class SampleService {
+    @Inject
+    private CarbonadoHandler carbonadoHandler
+
+    String getPersonName(int id) {
+         carbonadoHandler.withCarbonado { String repositoryName, Repository repository ->
+             ...
+         }
+    }
+}
+----
+
+== Events
+
+The following events will be triggered by `{api_carbonado_handler}`
+
+CarbonadoConnectStart(String repositoryName, Map<String, Object> config):: Triggered before connecting to the repository.
+CarbonadoConnectEnd(String repositoryName, Map<String, Object> config, Carbonado carbonado):: Triggered after connecting to the repository.
+CarbonadoDisconnectStart(String repositoryName, Map<String, Object> config, Carbonado carbonado):: Triggered before disconnecting from the repository.
+CarbonadoDisconnectEnd(String repositoryName, Map<String, Object> config):: Triggered after disconnecting from the repository.
+
+NOTE: Repository events may be triggered during connection and disconnection from a `{link_repository}`.
+
+== AST Transformation
+
+You can apply the `{api_carbonado_aware}` AST transformation on any class. This injects the behavior of `{api_carbonado_handler}`
+into said class. The previous Groovy service example can be rewritten as follows
+
+[source,groovy,options="nowrap"]
+.com.acme.SampleService.groovy
+----
+package com.acme
+
+import griffon.core.artifact.GriffonService
+import griffon.metadata.ArtifactProviderFor
+import griffon.transform.CarbonadoAware
+
+import com.amazon.carbonado.Repository
+
+@CarbonadoAware
+@ArtifactProviderFor(GriffonService)
+class SampleService {
+    String getPersonName(int id) {
+         withCarbonado { String repositoryName, Repository repository ->
+             ...
+         }
+    }
+}
+----
+
+== DSL Descriptors
+
+This plugin provides DSL descriptors for Intellij IDEA and Eclipse (provided you have the Groovy Eclipse plugin installed).
+These descriptors are found inside the `griffon-carbonado-groovy-compile-{project-version}.jar`, with locations
+
+ * dsdl/griffon_carbonado.dsld
+ * gdsl/griffon_carbonado.gdsl

@@ -1,0 +1,11 @@
+
+:link_carbonado: link:https://github.com/Carbonado/Carbonado[Carbonado, window="_blank"]
+:link_repository: com.amazon.carbonado.Repository
+:api_carbonado_handler: link:api/griffon/plugins/carbonado/CarbonadoHandler.html[CarbonadoHandler, window="_blank"]
+:api_repository_callback: link:api/griffon/plugins/carbonado/RepositoryCallback.html[RepositoryCallback, window="_blank"]
+:api_carbonado_aware: link:api/griffon/transform/CarbonadoAware.html[@CarbonadoAware, window="_blank"]
+:api_carbonado_bootstrap: link:api/griffon/plugins/carbonado/CarbonadoBootstrap.html[CarbonadoBootstrap, window="_blank"]
+
+:path_griffon_carbonado_core: {rootdir}/subprojects/griffon-carbonado-core
+:path_griffon_carbonado_groovy_compile: {rootdir}/subprojects/griffon-carbonado-groovy-compile
+

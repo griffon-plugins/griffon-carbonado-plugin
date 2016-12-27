@@ -1,0 +1,9 @@
+
+[[_introduction]]
+= Introduction
+
+The link:https://github.com/Carbonado/Carbonado[Carbonado, window="_blank"] plugin enables lightweight access datastores using
+the Carbonado persistence abstraction layer. This plugin does NOT provide domain classes nor dynamic finders like GORM does.
+
+Griffon version: {griffon-version}
+
