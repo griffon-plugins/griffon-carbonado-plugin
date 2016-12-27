@@ -1,0 +1,4 @@
+griffon.plugins.carbonado
+griffon.transform
+org.codehaus.griffon.runtime.carbonado
+org.codehaus.griffon.runtime.jmx
