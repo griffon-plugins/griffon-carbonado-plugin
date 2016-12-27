@@ -15,7 +15,6 @@
  */
 package org.codehaus.griffon.runtime.carbonado;
 
-import com.amazon.carbonado.ConfigurationException;
 import com.amazon.carbonado.Repository;
 import com.amazon.carbonado.RepositoryException;
 import com.amazon.carbonado.repo.jdbc.JDBCRepositoryBuilder;
@@ -150,7 +149,7 @@ public class DefaultRepositoryFactory extends AbstractObjectFactory<Repository> 
     }
 
     @Nonnull
-    private Repository createRepository(@Nonnull Map<String, Object> config, @Nonnull String name) throws ConfigurationException, RepositoryException {
+    private Repository createRepository(@Nonnull Map<String, Object> config, @Nonnull String name) throws RepositoryException {
         String type = getConfigValueAsString(config, "type", "map");
         if ("jdbc".equalsIgnoreCase(type)) {
             return createJDBCRepository(getConfigValue(config, "jdbc", Collections.<String, Object>emptyMap()), name);
@@ -164,7 +163,7 @@ public class DefaultRepositoryFactory extends AbstractObjectFactory<Repository> 
     }
 
     @Nonnull
-    private Repository createJDBCRepository(Map<String, Object> properties, String name) throws ConfigurationException, RepositoryException {
+    private Repository createJDBCRepository(Map<String, Object> properties, String name) throws RepositoryException {
         JDBCRepositoryBuilder builder = new JDBCRepositoryBuilder();
         builder.setName(name);
         builder.setDataSource(getDataSource(name));
@@ -173,7 +172,7 @@ public class DefaultRepositoryFactory extends AbstractObjectFactory<Repository> 
     }
 
     @Nonnull
-    private Repository createBDBRepository(Map<String, Object> properties, String name) throws ConfigurationException, RepositoryException {
+    private Repository createBDBRepository(Map<String, Object> properties, String name) throws RepositoryException {
         BDBRepositoryBuilder builder = new BDBRepositoryBuilder();
         builder.setName(name);
         setPropertiesNoException(builder, properties);
@@ -181,7 +180,7 @@ public class DefaultRepositoryFactory extends AbstractObjectFactory<Repository> 
     }
 
     @Nonnull
-    private Repository createMapRepository(Map<String, Object> properties, String name) throws ConfigurationException, RepositoryException {
+    private Repository createMapRepository(Map<String, Object> properties, String name) throws RepositoryException {
         MapRepositoryBuilder builder = new MapRepositoryBuilder();
         builder.setName(name);
         setPropertiesNoException(builder, properties);

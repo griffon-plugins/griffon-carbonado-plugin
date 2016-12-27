@@ -155,7 +155,9 @@ class CarbonadoSpec extends Specification {
             List<Person> list = []
             Storage<Person> people = repository.storageFor(Person)
             Cursor<Person> peopleCursor = people.query().fetch()
-            while(peopleCursor.hasNext()) { list << peopleCursor.next() }
+            while (peopleCursor.hasNext()) {
+                list << peopleCursor.next()
+            }
             list
         }
 

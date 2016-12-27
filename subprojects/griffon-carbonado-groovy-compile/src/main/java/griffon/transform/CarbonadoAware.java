@@ -15,15 +15,17 @@
  */
 package griffon.transform;
 
-import griffon.plugins.carbonado.CarbonadoHandler;
-
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * <p>Annotates a class.</p>
  *
  * @author Andres Almiray
- * @see CarbonadoHandler
+ * @see griffon.plugins.carbonado.CarbonadoHandler
  */
 @Documented
 @Retention(RetentionPolicy.SOURCE)
