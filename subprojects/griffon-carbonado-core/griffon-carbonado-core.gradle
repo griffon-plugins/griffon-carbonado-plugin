@@ -5,12 +5,13 @@ griffon {
     disableDependencyResolution = false
     includeGroovyDependencies = false
     version = rootProject.griffonVersion
+    applicationProject = false
 }
 
 apply from: rootProject.file('gradle/code-coverage.gradle')
 
 dependencies {
-    compile 'org.codehaus.griffon.plugins:griffon-datasource-core:1.2.0'
+    compile 'org.codehaus.griffon.plugins:griffon-datasource-core:2.0.0'
 
     compile "com.amazon.carbonado:carbonado:$carbonadoVersion"
 
@@ -23,7 +24,7 @@ dependencies {
     compile 'com.sleepycat:je:6.0.11'
 
     testRuntime "org.slf4j:slf4j-simple:$slf4jVersion"
-    testRuntime('com.h2database:h2:1.4.193') { transitive = false }
+    testRuntime("com.h2database:h2:$h2Version") { transitive = false }
 
     testRuntime "org.codehaus.griffon:griffon-guice:${griffon.version}"
     testRuntime "org.codehaus.griffon:griffon-groovy:${griffon.version}"
