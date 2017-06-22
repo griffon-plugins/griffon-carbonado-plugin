@@ -9,6 +9,11 @@ image:https://api.bintray.com/packages/griffon/griffon-plugins/{project-name}/im
 
 ---
 
+image:https://img.shields.io/gitter/room/griffon/griffon.js.svg[link="https://gitter.im/griffon/griffon]
+image:https://img.shields.io/badge/donations-Patreon-orange.svg[https://www.patreon.com/user?u=6609318]
+
+---
+
 The link:https://github.com/Carbonado/Carbonado[Carbonado, window="_blank"] plugin enables lightweight access datastores using
 the Carbonado persistence abstraction layer. This plugin does NOT provide domain classes nor dynamic finders like GORM does.
 
